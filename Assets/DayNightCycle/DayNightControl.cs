@@ -5,7 +5,7 @@ using UnityEngine.Events;
 public class DayNightControl : MonoBehaviour
 {
     public Light sunLight; // Assign your directional light in the Inspector
-    public float cycleLengthInSeconds = 60f; //time of a whole day, can be adjusted in Unity editor
+    public float cycleLengthInSeconds = 30f; //time of a whole day, can be adjusted in Unity editor
 
     [SerializeField]
     private int DaysPassedInGame = 1;
