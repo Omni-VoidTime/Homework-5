@@ -22,7 +22,10 @@ public class PlayerInteractPoint:MonoBehaviour
     private void OnTileInteractPerformed(InputAction.CallbackContext context)
     {
         Debug.Log("Space is pressed");//player press space to interact with the current tile
-        curTile.GetComponent<FarmTileControl>().InteractWithFarmTile();
+        if (curTile == null) return;
+        FarmTileControl farmTileControl = curTile.GetComponent<FarmTileControl>();
+        if(farmTileControl == null) return;
+        farmTileControl.InteractWithFarmTile();
 
     }
 

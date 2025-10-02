@@ -1,7 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FarmTIleManager:MonoBehaviour
 {
+    public List<FarmTileControl> tileList;
+
     public GameObject FarmTile;
     public Transform FarmTileSpawnStartLocation;
     private Vector3 curFarmTileSpawnPos;
@@ -12,6 +16,10 @@ public class FarmTIleManager:MonoBehaviour
     
     private void Start()
     {
+        //initialize tile list
+        tileList = new List<FarmTileControl>();
+
+        //other stuff
         curFarmTileSpawnPos=FarmTileSpawnStartLocation.position;
         curFarmTileSpawnPos.y = - FarmTile.transform.localScale.y / 2 + 0.05f;//move top of tile close to the ground surface
         int numTileGenerated = 0;
@@ -24,9 +32,34 @@ public class FarmTIleManager:MonoBehaviour
                 numTileGenerated++;
                 curFarmTile.name = "Farm Tile " + numTileGenerated.ToString();
                 curFarmTile.transform.parent = transform;//put all the tiles under the tile manager
+                //add tile to list
+                tileList.Add(curFarmTile.GetComponent<FarmTileControl>());
             }
             curFarmTileSpawnPos.z += FarmTile.transform.localScale.z + gapSizeBetweenTiles;
             curFarmTileSpawnPos.x = FarmTileSpawnStartLocation.position.x;
         }
+    }
+
+    private void Update()
+    {
+        //check win condition: all tiles watered
+        if (LevelWon())
+        {
+            SceneManager.LoadScene("Scene2-Store");
+        }
+    }
+
+    bool LevelWon()
+    {
+        //check if every tile watered
+        foreach (FarmTileControl tile in tileList)
+        {
+            //if we find one not watered, return false
+            if (tile.tileCond != FarmTileControl.FarmTileCond.Watered)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
