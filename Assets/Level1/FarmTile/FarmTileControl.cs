@@ -21,12 +21,14 @@ public class FarmTileControl:MonoBehaviour
     private int daysPassedSinceLastInteraction=0;
     [SerializeField]
     private GameObject dayNightControl;
+    [SerializeField]
+    private ResourceBarTracker Stamina;
 
     public void Start()
     {
         tileCond = FarmTileCond.Grass;//start with grass
         GameObject tileEdge;
-        
+        Stamina = GameObject.Find("Canvas/StaminaBar/Resource").GetComponent<ResourceBarTracker>();
         foreach (Transform edge in transform)
         {
             tileEdge = edge.gameObject;
@@ -36,7 +38,7 @@ public class FarmTileControl:MonoBehaviour
         AudioSource[] audios = gameObject.GetComponents<AudioSource>();
         stepTileAudio = audios[0];
         tillTileAudio = audios[1];
-        waterTileAudio =audios[2];
+        waterTileAudio = audios[2];
 
         dayNightControl = GameObject.Find("DayNightController");
         dayNightControl.GetComponent<DayNightControl>().listenToDayPassEvent(this.gameObject);
@@ -61,25 +63,31 @@ public class FarmTileControl:MonoBehaviour
     //API prepared for the player to interact with tiles when steping on it and press the space key
     public void InteractWithFarmTile()
     {
-        switch (tileCond){
-            case FarmTileCond.Grass://interact with the grass tile tills it
-                Debug.Log("Player is tilling the tile " + transform.name);
-                tillTileAudio.Play();
-                tileCond = FarmTileCond.Tilled;
-                UpdateTileMaterial();
-                daysPassedSinceLastInteraction = 0;
-                break;
-            case FarmTileCond.Tilled://interact with the tilled land waters it
-                Debug.Log("Player is watering the tile " + transform.name);
-                waterTileAudio.Play();
-                tileCond= FarmTileCond.Watered;
-                UpdateTileMaterial();
-                daysPassedSinceLastInteraction = 0;
-                break;
-            case FarmTileCond.Watered://repeated interaction on the watered tile does not change it to other conditions
-                Debug.Log("Tile is watered and ready for plants " + transform.name);
-                daysPassedSinceLastInteraction = 0;
-                break;
+        if (Stamina.CurrentResource() != 0)
+        {
+            switch (tileCond)
+            {
+                case FarmTileCond.Grass://interact with the grass tile tills it
+                    Debug.Log("Player is tilling the tile " + transform.name);
+                    tillTileAudio.Play();
+                    tileCond = FarmTileCond.Tilled;
+                    UpdateTileMaterial();
+                    daysPassedSinceLastInteraction = 0;
+                    Stamina.ChangeResourceByAmount(-5);
+                    break;
+                case FarmTileCond.Tilled://interact with the tilled land waters it
+                    Debug.Log("Player is watering the tile " + transform.name);
+                    waterTileAudio.Play();
+                    tileCond = FarmTileCond.Watered;
+                    UpdateTileMaterial();
+                    daysPassedSinceLastInteraction = 0;
+                    Stamina.ChangeResourceByAmount(-5);
+                    break;
+                case FarmTileCond.Watered://repeated interaction on the watered tile does not change it to other conditions
+                    Debug.Log("Tile is watered and ready for plants " + transform.name);
+                    daysPassedSinceLastInteraction = 0;
+                    break;
+            }
         }
     }
 
@@ -88,8 +96,8 @@ public class FarmTileControl:MonoBehaviour
     //this tile's material gets brighter to show the current tile that the player is about to interact with
     public void EnterTile()
     {
-        Debug.Log("Player entered tile "+transform.name);
-        foreach(Material mat in curTileEdgeMaterial )
+        Debug.Log("Player entered tile " + transform.name);
+        foreach (Material mat in curTileEdgeMaterial)
             mat.EnableKeyword("_EMISSION");
 
 
