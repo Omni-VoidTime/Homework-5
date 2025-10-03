@@ -13,6 +13,7 @@ public class ResourceBarTracker : MonoBehaviour
     [SerializeField] private int resourceMax = 100;
     [SerializeField] private int resourceAbsoluteMax = 1000;
     [SerializeField] private bool overkillPossible;
+    private float timer = 0;
 
 
     private void Start()
@@ -20,6 +21,18 @@ public class ResourceBarTracker : MonoBehaviour
         UpdateBarAndResourceText();
     }
 
+    private void Update()
+    {
+        if (timer < 5)
+        {
+            timer = timer + Time.deltaTime;
+        }
+        else
+        {
+            ChangeResourceByAmount(5);
+            timer = 0;
+        }
+    }
     private void UpdateBarAndResourceText()
     {
         if (resourceMax <= 0)

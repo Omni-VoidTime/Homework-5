@@ -2149,8 +2149,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
   bar: {fileID: 1955200312}
-  resourceCurrent: 150
-  resourceMax: 150
+  resourceCurrent: 100
+  resourceMax: 100
   resourceAbsoluteMax: 1000
   overkillPossible: 0
 --- !u!114 &1955200312
