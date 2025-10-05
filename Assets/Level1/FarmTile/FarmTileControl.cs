@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class FarmTileControl:MonoBehaviour
 {
@@ -24,6 +25,12 @@ public class FarmTileControl:MonoBehaviour
     [SerializeField]
     private ResourceBarTracker Stamina;
 
+  
+    
+    // keeps track of what’s currently spawned
+    public GameObject currentPlant; 
+
+
     public void Start()
     {
         tileCond = FarmTileCond.Grass;//start with grass
@@ -43,6 +50,19 @@ public class FarmTileControl:MonoBehaviour
         dayNightControl = GameObject.Find("DayNightController");
         dayNightControl.GetComponent<DayNightControl>().listenToDayPassEvent(this.gameObject);
     }
+
+private void Update()
+{
+    if (tileCond == FarmTileCond.Watered && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+    {
+        if (currentPlant == null && PlantManager.Instance != null)
+        {
+            currentPlant = PlantManager.Instance.SpawnPlant(transform.position);
+            Debug.Log("Plant spawned!");
+        }
+    }
+}
+
 
     public void UpdateTileMaterial()//called to update the tile appearance when the farm tile changes states
     {
@@ -75,13 +95,19 @@ public class FarmTileControl:MonoBehaviour
                     daysPassedSinceLastInteraction = 0;
                     Stamina.ChangeResourceByAmount(-5);
                     break;
-                case FarmTileCond.Tilled://interact with the tilled land waters it
+                case FarmTileCond.Tilled: // player is watering the tile
                     Debug.Log("Player is watering the tile " + transform.name);
                     waterTileAudio.Play();
                     tileCond = FarmTileCond.Watered;
                     UpdateTileMaterial();
                     daysPassedSinceLastInteraction = 0;
                     Stamina.ChangeResourceByAmount(-5);
+
+                    // Add one fund when watered
+                    if (FundManager.Instance != null)
+                    {
+                    FundManager.Instance.AddFunds(1);
+                    }
                     break;
                 case FarmTileCond.Watered://repeated interaction on the watered tile does not change it to other conditions
                     Debug.Log("Tile is watered and ready for plants " + transform.name);
@@ -111,25 +137,37 @@ public class FarmTileControl:MonoBehaviour
             mat.DisableKeyword("_EMISSION");
     }
 
+
     //API provided for the day night counter to tell the tile that a day just passed
-    public void ADayPassed()
+ public void ADayPassed()
     {
-        Debug.Log("ADayPassed");
         daysPassedSinceLastInteraction++;
-        Debug.Log(transform.name.ToString() + " days passed: " + daysPassedSinceLastInteraction.ToString());
-        if (daysPassedSinceLastInteraction >= 2)//3days passed since last farm tile interaction
+
+        if (tileCond == FarmTileCond.Watered && currentPlant != null)
+        {
+            currentPlant.GetComponent<PlantGrowth>().Grow();
+        }
+
+        if (daysPassedSinceLastInteraction >= 2)
         {
             switch (tileCond)
             {
-                case FarmTileCond.Watered: //soil dry after 2 days
+                case FarmTileCond.Watered:
                     tileCond = FarmTileCond.Tilled;
                     UpdateTileMaterial();
                     daysPassedSinceLastInteraction = 0;
                     break;
-                case FarmTileCond.Tilled: //grass grows back after 2 days
+
+                case FarmTileCond.Tilled:
                     tileCond = FarmTileCond.Grass;
                     UpdateTileMaterial();
                     daysPassedSinceLastInteraction = 0;
+
+                    if (currentPlant != null)
+                    {
+                        Destroy(currentPlant);
+                        currentPlant = null;
+                    }
                     break;
             }
         }

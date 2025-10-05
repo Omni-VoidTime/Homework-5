@@ -468,7 +468,11 @@ MonoBehaviour:
   grassMat: {fileID: 2100000, guid: 45eb7efec0c8f504285b382733758e52, type: 2}
   tilledMat: {fileID: 2100000, guid: 053fa0c86b03be449bd117d80d1eb19c, type: 2}
   wateredMat: {fileID: 2100000, guid: da86e0e9da248f44685781dc53d77c8f, type: 2}
-  dayNight: {fileID: 0}
+  dayNightControl: {fileID: 0}
+  Stamina: {fileID: 0}
+  smallPlant: {fileID: 6651310731303358679, guid: 1392dbd2be3bbd04d8e5c57b904b42ae, type: 3}
+  mediumPlant: {fileID: 5054277889059016994, guid: f12845bb4d1709a499e97026b8068627, type: 3}
+  largePlant: {fileID: 9218926353566358502, guid: 98541326b56e6e14eb84d42aa2461bac, type: 3}
 --- !u!82 &-4219563466296458282
 AudioSource:
   m_ObjectHideFlags: 0
